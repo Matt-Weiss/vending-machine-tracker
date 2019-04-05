@@ -10,14 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170914040805) do
+ActiveRecord::Schema.define(version: 20190405163839) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "machine_snacks", force: :cascade do |t|
+    t.bigint "snack_id"
+    t.bigint "machine_id"
+    t.index ["machine_id"], name: "index_machine_snacks_on_machine_id"
+    t.index ["snack_id"], name: "index_machine_snacks_on_snack_id"
+  end
+
   create_table "machines", force: :cascade do |t|
     t.string "location"
     t.bigint "owner_id"
+    t.bigint "machine_snacks_id"
+    t.index ["machine_snacks_id"], name: "index_machines_on_machine_snacks_id"
     t.index ["owner_id"], name: "index_machines_on_owner_id"
   end
 
@@ -25,5 +34,18 @@ ActiveRecord::Schema.define(version: 20170914040805) do
     t.string "name"
   end
 
+  create_table "snacks", force: :cascade do |t|
+    t.string "name"
+    t.string "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "machine_snacks_id"
+    t.index ["machine_snacks_id"], name: "index_snacks_on_machine_snacks_id"
+  end
+
+  add_foreign_key "machine_snacks", "machines"
+  add_foreign_key "machine_snacks", "snacks"
+  add_foreign_key "machines", "machine_snacks", column: "machine_snacks_id"
   add_foreign_key "machines", "owners"
+  add_foreign_key "snacks", "machine_snacks", column: "machine_snacks_id"
 end
